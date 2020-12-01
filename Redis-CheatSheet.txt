@@ -1,0 +1,176 @@
+Redis:
+-All keys are case sensitive.
+
+
+docker run -itd -p 6379:6379 redis
+
+Open command line on docker container.
+
+redis-cli
+CLEAR				// to clear the screen.
+
+Ping 				//if server is running it will return PONG
+
+Ping "hello world" 	// return "Hello World"
+
+***********************************************************************************************************************************************************
+STRING OPERATIONS:--
+***********************************************************************************************************************************************************
+
+SET KEY VALUE 		// You can also specify key like server:name or server:port
+
+SET FOO 100			//will set the value of FOO to 100
+
+GET FOO 			// it will return "100". If key does not exists then (nil).
+
+INCR FOO			//It will parse the value to integer and increments the value of FOO by 1.
+
+INCRBY FOO 10		// increments value of FOO by 10.
+
+DECR FOO 			// decrements the value of FOO by 1.
+
+DECRBY FOO 10		// decrement value of FOO by 10.
+
+EXISTS FOO 			//returns 1 if key already exists otherwise 0.
+
+DEL FOO 			// deletes the key if exists and return 1 otherwise 0.
+
+FLUSHALL 			//deletes all the keys.
+
+EXPIRE KEY SECONDS	// Specific key will expire after specific seconds.
+
+EXPIRE FOO 50		//FOO key will be expired after 50 seconds.
+
+TTL KEY				//It will give us the amount of seconds left for the key. -1 in case of key without expiration time. -2 if key does not exists.
+
+SETEX KEY SECONDS VALUE  // Sets the expiration time for a key while setting the value.
+
+PERSIST KEY			// Removes expiration timer from key.
+
+MSET				// To set multiple key values in same command.
+					// MSET key1 "foo" key2 "bar" sets key1 value to foo and key2 value to bar.
+					
+APPEND KEY VALUE    // appends value to key. 
+					// APPEND key1 " bar" will result "foo bar". It appends value to key's value and prints the length of new value.
+					
+RENAME KEY NEW_KEY_NAME // renames key to new key name.
+
+SETNX KEY VALUE		//Sets the value of key if key does not exits.
+
+MSET NX KEY VALUE	// sets the value of all the keys if none of the key exists.
+
+***********************************************************************************************************************************************************
+LIST OPERATIONS:--
+***********************************************************************************************************************************************************
+Redis Lists are simply lists of strings, sorted by insertion order. It is possible to add elements to a Redis List pushing new elements on the head (on the left) or on the tail (on the right) of the list.
+The max length of a list is 232 - 1 elements (4294967295, more than 4 billion of elements per list).
+
+
+LPUSH  				//command inserts a new element on the head
+					// LPUSH people "MIKE" will create a list people and push MIKE to the head of the list.
+
+RPUSH 				//inserts a new element on the tail
+					// RPUSH people "JOHN" will create a list "people" if it does not exist and push JOHN to the tail of the list.
+
+LRANGE				//Returns the specified elements of the list stored at key. 
+					//LRANGE people 0 -1 will return all elements of the list. As 0 is the index for first element and -1 for last.
+					127.0.0.1:6379> LPUSH people "Sam"
+					(integer) 1
+					127.0.0.1:6379> LPUSH people "MIKE"
+					(integer) 2
+					127.0.0.1:6379> LPUSH people "John"
+					(integer) 3
+					127.0.0.1:6379> LRANGE people 0 -1
+					1) "John"
+					2) "MIKE"
+					3) "Sam"
+					127.0.0.1:6379> LRANGE people 0 1
+					1) "John"
+					2) "MIKE"
+
+LLEN key			// LLEN people will return the count of elements in the list. 
+
+LPOP				// removes element from the head of the list and prints it.
+
+RPOP				// removes element from the tail and prints it.
+
+LINSERT				//Inserts element in the list stored at key either before or after the reference value pivot.
+					// LINSERT people BEFORE "ELEMENT_FROM_LIST"  "NEW_ELEMENT_TO_INSERT" if successful then print the size of list otherwise -1.
+					
+***********************************************************************************************************************************************************
+SET OPERATIONS:--
+***********************************************************************************************************************************************************
+Redis Sets are an unordered collection of Strings. It is possible to add, remove, and test for existence of members in O(1) (constant time regardless of the number of elements contained inside the Set).
+The max length of a set is 232 - 1 elements (4294967295, more than 4 billion of elements per list).
+
+SADD			// Adds elements to set.
+				// SADD cars "Ford" creates a set cars if does not exists and add/overwrite(if exists) "Ford" to it.
+				
+SISMEMBER		//this command will check if element exists in set. 
+				//SISMEMBER cars ABC will return 0 as ABC does not exists in cars. if it exists then it will return 1. 
+				
+SMEMBERS SETNAME // returns all members of the set.
+
+SCARD SETNAME 	//return the count of elements in the set.
+
+SMOVE			// moves element from one set to another.
+				// SMOVE cars trucks "Ford". Removes Ford from cars and add it to trucks. if successful then 1 otherwise 0.
+				
+SREM			// removes element from set.
+				// SREM cars Ford will remove Ford from cars.
+				
+SDIFF			//Returns the members of the set resulting from the difference between the first set and all the successive sets.
+				// cars = { Honda, BMW, Chevy}
+				// trucks = { Ford}
+				// othercars ={Jeep, Honda}
+				// SDIFF cars trucks jeeps will result {BMW, Chevy} as they are the only one that does not exists in other sets.
+
+***********************************************************************************************************************************************************
+SORTED SET OPERATIONS:--
+***********************************************************************************************************************************************************
+Redis Sorted Sets are, similarly to Redis Sets, non repeating collections of Strings. The difference is that every member of a Sorted Set is associated with score, that is used in order to take the sorted set ordered, from the smallest to the greatest score. While members are unique, scores may be repeated.
+
+ZADD 			// add element to set with score.
+				// ZADD users 1981 "Mike"  will add Mike to set and add a score 1981 to it.
+				// ZADD users 1981 "John"  will add John to set and add a same score 1981 to it.
+				// ZADD users 1980 "Doe"  will add Doe to set and add a score 1980 to it.
+				
+ZRANK			// it will give the rank of element in the set.
+
+ZRANGE 			//list the elements of the set. ZRANGE users 0 -1 will list all elements.
+
+ZINCRBY 		// increments the score by the given number. ZINCRBY users 1 "John"
+
+***********************************************************************************************************************************************************
+HASHES OPERATIONS:--
+***********************************************************************************************************************************************************
+Redis Hashes are maps between string fields and string values, so they are the perfect data type to represent objects (e.g. A User with a number of fields like name, surname, age, and so forth):
+
+HSET 			//Sets field in the hash stored at key to value. If key does not exist, a new key holding a hash is created. If field already exists in the hash, it is overwritten.
+				// HSET user:Mike name "Mike"
+				// HSET user:Mike email "Mike@test.com"
+				
+HGETALL user:Mike 	// Return all key and values for the hash.
+
+HMSET user:john name "John" email "John@Doe.com" age 25 //sets multiple props in one command.
+
+HKEYS user:john 	//it will return all the keys for the given hash.	
+
+HVALS user:john		//	it will return all the values for the given hash.
+
+hincrby user:john age 1	// increments the key value by 1. In this command, age will be incremented to 26.
+
+hdel user:john age		//deletes the key within hash.
+
+HLEN user:john			//give the count of key-value pair present in the hash.
+
+***********************************************************************************************************************************************************
+Data Persistence:--
+***********************************************************************************************************************************************************
+
+SAVE		//to take snapshot of data. The SAVE commands performs a synchronous save of the dataset producing a point in time snapshot of all the data inside the Redis instance, in the form of an RDB file.
+			//By default Redis saves snapshots of the dataset on disk, in a binary file called dump.rdb. (location /data/dump.rdb in docker). Location of dump can be configured in redis.conf file.
+			
+			//save 60 1000 this configuration will make Redis automatically dump the dataset to disk every 60 seconds if at least 1000 keys changed.
+
+
