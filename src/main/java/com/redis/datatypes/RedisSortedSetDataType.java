@@ -32,6 +32,7 @@ public class RedisSortedSetDataType {
 		userDOBMap.put("Mike", 1981.0);
 		userDOBMap.put("John", 1975.0);
 		userDOBMap.put("Doe", 1990.0);
+		userDOBMap.put("Linus", 1990.0);
 
 		// Add values to set
 		jedis.zadd("users", userDOBMap);
@@ -42,6 +43,12 @@ public class RedisSortedSetDataType {
 		System.out.println("Increment John's Score by 20");
 		jedis.zincrby("users", 20, "John");
 		printAll(jedis);
+		
+		//Get values based on score.
+		Set<String> values=jedis.zrangeByScore("users",1990.0 , 1990.0);
+		for (String string : values) {
+			System.out.println(string);
+		}
 		jedis.close();
 	}
 
